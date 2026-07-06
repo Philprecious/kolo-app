@@ -85,6 +85,23 @@ function Profile() {
       </section>
 
       <section className="mt-4 px-5">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-foreground">
+            <Terminal className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">Developer mode</p>
+            <p className="text-[11px] text-muted-foreground">Show the Nomba developer console & webhook audit stream on circle screens.</p>
+          </div>
+          <Switch
+            checked={devMode}
+            onCheckedChange={(v) => { setDevMode(v); toast.success(v ? "Developer mode on" : "Developer mode off"); }}
+          />
+        </div>
+      </section>
+
+
+      <section className="mt-4 px-5">
         <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-bold text-destructive">
           <LogOut className="h-4 w-4" /> Log out
         </button>
