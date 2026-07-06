@@ -106,15 +106,29 @@ function CircleDetail() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-2xl bg-white/10 p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/70">Gross Pool Target</p>
-                <p className="mt-0.5 text-sm font-bold">{nextMember.name}</p>
-              </div>
-              <p className="text-lg font-bold text-gold font-mono">{naira(c.amount * c.members.length)}</p>
+          {/* PROMINENT Next Recipient card */}
+          <div className="mt-5 rounded-2xl bg-white/10 p-4 ring-1 ring-gold/40">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gold">
+              <Crown className="h-3.5 w-3.5" /> Next Recipient — This Cycle
             </div>
-            <p className="mt-2 text-[10px] leading-snug text-white/60">*Disbursed via automated bank transfer subject to network routing fees.</p>
+            <div className="mt-3 flex items-center gap-3">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gold text-lg font-bold text-gold-foreground shadow-btn">
+                {nextMember.initials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-lg font-bold text-white">{nextMember.name}</p>
+                <p className="text-[11px] font-semibold text-white/70">
+                  Collection Turn: Position {c.cycle} of {c.members.length}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-xl bg-gold/15 px-3 py-2.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gold/90">Lump-sum payout</p>
+              <p className="mt-0.5 text-3xl font-bold text-gold font-mono">{naira(c.amount * c.members.length)}</p>
+              <p className="mt-1 text-[10px] text-white/60">
+                {c.members.length} members × {naira(c.amount)} — one recipient collects the entire pot.
+              </p>
+            </div>
           </div>
         </div>
       </section>
