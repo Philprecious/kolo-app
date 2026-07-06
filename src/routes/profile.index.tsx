@@ -11,7 +11,7 @@ export const Route = createFileRoute("/profile/")({
 });
 
 function Profile() {
-  const { user, circles } = useApp();
+  const { user, circles, devMode, setDevMode } = useApp();
   const adminCount = circles.filter((c) => c.role === "admin").length;
   const memberCount = circles.filter((c) => c.role === "member").length;
 
