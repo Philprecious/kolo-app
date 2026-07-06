@@ -176,6 +176,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [circles, setCircles] = useState(initialCircles);
   const [activity, setActivity] = useState(initialActivity);
   const [payments, setPayments] = useState(initialPayments);
+  const [devMode, setDevMode] = useState(false);
 
   const addCircle: AppState["addCircle"] = (c) => {
     const id = c.name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + Math.random().toString(36).slice(2, 6);
