@@ -164,6 +164,8 @@ interface AppState {
   circles: Circle[];
   activity: ActivityItem[];
   payments: Payment[];
+  devMode: boolean;
+  setDevMode: (v: boolean) => void;
   addCircle: (c: Omit<Circle, "id" | "members" | "cycle" | "nextDue" | "nextPayoutMember" | "createdAt">) => string;
   payContribution: (paymentId: string) => void;
 }
