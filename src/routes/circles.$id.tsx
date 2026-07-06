@@ -4,7 +4,7 @@ import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp, naira } from "@/lib/store";
 import {
   ArrowLeft, Copy, QrCode, UserPlus, Settings, BarChart3, XCircle,
-  BellRing, CheckCircle2, ShieldCheck, Lock, ChevronDown, ChevronUp, Terminal, AlertOctagon,
+  BellRing, CheckCircle2, ShieldCheck, Lock, ChevronDown, ChevronUp, Terminal, AlertOctagon, Crown,
 } from "lucide-react";
 import { toast } from "sonner";
 
