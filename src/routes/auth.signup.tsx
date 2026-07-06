@@ -2,9 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
-import googleIcon from "@/assets/social-google.svg";
-import facebookIcon from "@/assets/social-facebook.svg";
-import appleIcon from "@/assets/social-apple.svg";
 
 export const Route = createFileRoute("/auth/signup")({
   head: () => ({
