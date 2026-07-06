@@ -96,13 +96,9 @@ function Onboarding() {
   }, [embla]);
 
   const finish = () => {
-    try {
-      localStorage.setItem("kolo_onboarded", "true");
-    } catch {
-      /* ignore */
-    }
-    navigate({ to: "/" });
+    navigate({ to: "/auth/signup" });
   };
+
 
   const next = () => {
     if (!embla) return;
