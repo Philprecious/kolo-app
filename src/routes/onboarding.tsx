@@ -5,6 +5,7 @@ import onb1 from "@/assets/onboarding-1.png";
 import onb2 from "@/assets/onboarding-2.png";
 import onb3 from "@/assets/onboarding-3.png";
 import onb4 from "@/assets/onboarding-4.png";
+import koloLogo from "@/assets/kolo-logo.png";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
