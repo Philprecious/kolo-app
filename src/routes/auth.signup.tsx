@@ -125,7 +125,7 @@ function SocialBtn({ label, children }: { label: string; children: React.ReactNo
     <button
       type="button"
       aria-label={`Continue with ${label}`}
-      className="grid h-14 w-14 place-items-center rounded-full bg-white shadow-sm transition active:scale-95"
+      className="grid h-14 w-14 place-items-center rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] transition active:scale-95"
     >
       {children}
     </button>
@@ -154,9 +154,8 @@ function FacebookIcon() {
 
 function AppleIcon() {
   return (
-    <svg viewBox="0 0 48 48" className="h-8 w-8" aria-hidden>
-      <circle cx="24" cy="24" r="22" fill="#111" />
-      <path fill="#fff" d="M31 25.4c0-3.7 3-5.5 3.2-5.6-1.7-2.6-4.5-2.9-5.5-3-2.3-.2-4.5 1.4-5.7 1.4-1.2 0-3-1.4-4.9-1.3-2.5 0-4.9 1.5-6.2 3.7-2.7 4.6-.7 11.5 1.9 15.3 1.3 1.9 2.8 4 4.8 3.9 1.9-.1 2.6-1.2 4.9-1.2s2.9 1.2 4.9 1.2c2 0 3.3-1.9 4.6-3.8 1.4-2.2 2-4.3 2.1-4.4-.1 0-4-1.5-4.1-6.2zm-3.8-11.4c1-1.3 1.7-3 1.5-4.8-1.5.1-3.3 1-4.4 2.3-1 1.1-1.8 2.9-1.6 4.6 1.7.1 3.4-.8 4.5-2.1z" />
+    <svg viewBox="0 0 24 24" className="h-8 w-8" aria-hidden>
+      <path fill="#000" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
     </svg>
   );
 }
