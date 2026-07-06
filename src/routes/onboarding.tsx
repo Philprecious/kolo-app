@@ -194,7 +194,7 @@ function Onboarding() {
 
                     <p className="mt-5 text-sm text-neutral-500">
                       Already have an account?{" "}
-                      <Link to="/" className="font-semibold text-primary">
+                      <Link to="/auth/login" className="font-semibold text-primary">
                         Login
                       </Link>
                     </p>
