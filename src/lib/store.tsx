@@ -180,7 +180,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const newCircle: Circle = {
       ...c,
       id,
-      members: [{ id: "m0", name: "Funke Adeola (You)", initials: "FA", status: "paid", position: 1 }],
+      members: [{ id: "m0", name: "Philip Precious (You)", initials: "PP", status: "paid", position: 1 }],
       cycle: 1,
       nextDue: "In 7 days",
       nextPayoutMember: "You",
