@@ -44,7 +44,7 @@ function buildLedger(amountNaira: number, idx: number, status: "paid" | "pending
 
 function CircleDetail() {
   const { id } = useParams({ from: "/circles/$id" });
-  const { circles } = useApp();
+  const { circles, devMode } = useApp();
   const c = circles.find((x) => x.id === id);
   const [devOpen, setDevOpen] = useState(false);
 
