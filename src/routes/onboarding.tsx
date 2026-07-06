@@ -139,22 +139,22 @@ function Onboarding() {
                       className="h-full w-auto object-contain"
                     />
                   </div>
-                  {/* Dark purple curve peeking up on right, white curve dipping in on left */}
+                  {/* Single dark purple ribbon curve, matching reference */}
                   <svg
                     aria-hidden
-                    viewBox="0 0 440 110"
+                    viewBox="0 0 440 90"
                     preserveAspectRatio="none"
-                    className="absolute inset-x-0 -bottom-px h-[90px] w-full"
+                    className="absolute inset-x-0 -bottom-px h-[70px] w-full"
                   >
-                    {/* Dark purple wave */}
+                    {/* White base fills bottom; a curved top edge reveals pale-purple above */}
                     <path
-                      d="M0,110 L0,75 C90,75 130,70 200,55 C280,38 340,10 440,25 L440,110 Z"
-                      className="fill-primary"
-                    />
-                    {/* White foreground with rounded top-left cutout */}
-                    <path
-                      d="M0,110 L0,95 C80,95 130,88 200,72 C285,52 350,30 440,45 L440,110 Z"
+                      d="M0,90 L440,90 L440,20 C340,10 260,55 160,60 C110,62 60,55 0,50 Z"
                       fill="white"
+                    />
+                    {/* Dark purple ribbon sitting on the boundary */}
+                    <path
+                      d="M0,50 C60,55 110,62 160,60 C260,55 340,10 440,20 L440,40 C340,32 260,72 160,76 C110,78 60,72 0,68 Z"
+                      className="fill-primary"
                     />
                   </svg>
                 </div>
