@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp } from "@/lib/store";
-import { ChevronRight, Shield, Bell, HelpCircle, LogOut, Settings, Copy } from "lucide-react";
+import { ChevronRight, Shield, Bell, HelpCircle, LogOut, Settings, Copy, Terminal } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/")({
