@@ -300,7 +300,7 @@ function CircleDetail() {
       )}
 
       {/* Nomba Developer Console (admin only) */}
-      {c.role === "admin" && (
+      {c.role === "admin" && devMode && (
         <section className="mt-6 px-5">
           <button
             onClick={() => setDevOpen((o) => !o)}
