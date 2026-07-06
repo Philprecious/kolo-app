@@ -110,9 +110,7 @@ function Onboarding() {
   if (phase === "splash") {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-white">
-        <h1 className="text-6xl font-extrabold tracking-tight text-primary">
-          KÒLÓ
-        </h1>
+        <img src={koloLogo} alt="KÒLÓ" className="w-[260px] max-w-[70%]" />
       </div>
     );
   }
