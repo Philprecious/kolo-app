@@ -60,20 +60,20 @@ export interface User {
 }
 
 const initialUser: User = {
-  name: "Funke Adeola",
+  name: "Philip Precious",
   phone: "+234 803 555 0114",
-  email: "funke@kolo.ng",
-  initials: "FA",
+  email: "philip@kolo.ng",
+  initials: "PP",
   virtualAccount: {
     number: "8021340977",
     bank: "Nomba Virtual Account",
-    name: "FUNKE ADEOLA / KOLO",
+    name: "PHILIP PRECIOUS / KOLO",
   },
 };
 
 const seedMembers = (n: number, paidCount: number): Member[] => {
   const names = [
-    "Funke Adeola", "Tunde Bakare", "Chioma Okafor", "Kelechi Umeh",
+    "Philip Precious", "Tunde Bakare", "Chioma Okafor", "Kelechi Umeh",
     "Aisha Bello", "Segun Owolabi", "Ngozi Eze", "Yusuf Musa",
     "Zainab Kola", "Deji Ade", "Ifeanyi Obi", "Halima Bala",
   ];
@@ -180,7 +180,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const newCircle: Circle = {
       ...c,
       id,
-      members: [{ id: "m0", name: "Funke Adeola (You)", initials: "FA", status: "paid", position: 1 }],
+      members: [{ id: "m0", name: "Philip Precious (You)", initials: "PP", status: "paid", position: 1 }],
       cycle: 1,
       nextDue: "In 7 days",
       nextPayoutMember: "You",
