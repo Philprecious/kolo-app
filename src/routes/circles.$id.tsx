@@ -273,18 +273,19 @@ function CircleDetail() {
               </div>
             )}
 
-            {/* Nomba verification log */}
-            <div className="mt-4 rounded-xl bg-[#0F1226] p-3 text-[11px] text-white/80 font-mono leading-relaxed">
-              <p className="text-white/50">$ Calling Nomba Account Verification API…</p>
-              <p><span className="text-[#E8883A]">POST</span> /transfers/bank/lookup</p>
-              <p className="text-white/50">{`{ "accountNumber": "${"0123456789"}", "bankCode": "058" }`}</p>
-              <div className="mt-2 rounded-lg bg-white/5 px-2 py-1.5">
-                <p>resolved_name: <span className="text-white">{nextMember.name.toUpperCase()}</span></p>
-                <p>bank: <span className="text-white">GTBank</span></p>
+            {/* Friendly recipient verification card */}
+            <div className="mt-4 rounded-2xl border border-success/25 bg-success-soft/60 p-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-success text-white shadow-btn">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-success">Recipient Account Verified</p>
+                  <p className="mt-0.5 truncate text-sm font-bold text-foreground">{nextMember.name.toUpperCase()}</p>
+                  <p className="text-[11px] text-muted-foreground">GTBank · Verified via Nomba Bank Lookup</p>
+                </div>
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
               </div>
-              <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-success/20 px-2 py-1 text-success">
-                <ShieldCheck className="h-3 w-3" /> ✓ VERIFIED — Recipient Identity Matches. Safe to Disburse.
-              </p>
             </div>
 
             <button
