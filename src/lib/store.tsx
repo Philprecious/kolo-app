@@ -209,7 +209,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppCtx.Provider value={{ user: initialUser, circles, activity, payments, addCircle, payContribution }}>
+    <AppCtx.Provider value={{ user: initialUser, circles, activity, payments, devMode, setDevMode, addCircle, payContribution }}>
       {children}
     </AppCtx.Provider>
   );
