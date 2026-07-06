@@ -164,6 +164,8 @@ interface AppState {
   circles: Circle[];
   activity: ActivityItem[];
   payments: Payment[];
+  devMode: boolean;
+  setDevMode: (v: boolean) => void;
   addCircle: (c: Omit<Circle, "id" | "members" | "cycle" | "nextDue" | "nextPayoutMember" | "createdAt">) => string;
   payContribution: (paymentId: string) => void;
 }
@@ -174,6 +176,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [circles, setCircles] = useState(initialCircles);
   const [activity, setActivity] = useState(initialActivity);
   const [payments, setPayments] = useState(initialPayments);
+  const [devMode, setDevMode] = useState(false);
 
   const addCircle: AppState["addCircle"] = (c) => {
     const id = c.name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + Math.random().toString(36).slice(2, 6);
@@ -206,7 +209,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppCtx.Provider value={{ user: initialUser, circles, activity, payments, addCircle, payContribution }}>
+    <AppCtx.Provider value={{ user: initialUser, circles, activity, payments, devMode, setDevMode, addCircle, payContribution }}>
       {children}
     </AppCtx.Provider>
   );
