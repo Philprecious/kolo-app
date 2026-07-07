@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Role = "admin" | "member";
 export type Frequency = "Weekly" | "Monthly" | "Custom";
@@ -24,18 +24,25 @@ export interface Circle {
   members: Member[];
   cycle: number;
   totalCycles: number;
-  nextDue: string; // human string
+  nextDue: string;
   nextPayoutMember: string;
   createdAt: string;
 }
 
 export interface ActivityItem {
   id: string;
-  type: "contribution" | "joined" | "payout" | "reminder" | "overdue" | "created";
+  type: "contribution" | "joined" | "payout" | "reminder" | "overdue" | "created" | "invitation";
   title: string;
   meta: string;
   time: string;
   circleId?: string;
+  // invitation-only
+  invite?: {
+    groupName: string;
+    from: string;
+    inviteCode: string;
+    status: "pending" | "accepted" | "declined";
+  };
 }
 
 export interface Payment {
@@ -84,20 +91,20 @@ const seedMembers = (n: number, paidCount: number): Member[] => {
       id: `m${i}`,
       name,
       initials: (parts[0][0] + parts[1][0]).toUpperCase(),
-      status: i < paidCount ? "paid" : i === paidCount ? "pending" : "pending",
+      status: i < paidCount ? "paid" : "pending",
       position: i + 1,
-    };
+    } as Member;
   });
 };
 
 const initialCircles: Circle[] = [
   {
-    id: "friends",
-    name: "Friends Savings",
-    description: "Monthly Ajo with the girls. Payout goes to one member every month.",
+    id: "bodija-women",
+    name: "Bodija Women Ajo",
+    description: "Weekly market Ajo for the Bodija women's cooperative.",
     role: "admin",
     amount: 10000,
-    frequency: "Monthly",
+    frequency: "Weekly",
     maxMembers: 10,
     rotation: "Fixed Order",
     members: seedMembers(10, 6),
@@ -108,9 +115,9 @@ const initialCircles: Circle[] = [
     createdAt: "2 months ago",
   },
   {
-    id: "office",
-    name: "Office KOLO",
-    description: "Weekly contribution with the team at work.",
+    id: "precious-member",
+    name: "Precious Member Ajo",
+    description: "Rotating target-savings circle amongst trusted members.",
     role: "member",
     amount: 5000,
     frequency: "Weekly",
@@ -123,40 +130,28 @@ const initialCircles: Circle[] = [
     nextPayoutMember: "You",
     createdAt: "3 weeks ago",
   },
-  {
-    id: "family",
-    name: "Family Circle",
-    description: "Family savings towards year-end.",
-    role: "member",
-    amount: 20000,
-    frequency: "Monthly",
-    maxMembers: 6,
-    rotation: "Manual",
-    members: seedMembers(6, 3),
-    cycle: 2,
-    totalCycles: 6,
-    nextDue: "In 5 days",
-    nextPayoutMember: "Tunde Bakare",
-    createdAt: "1 month ago",
-  },
 ];
 
 const initialActivity: ActivityItem[] = [
-  { id: "a1", type: "contribution", title: "Your contribution was received", meta: "Friends Savings · ₦10,000", time: "2h ago", circleId: "friends" },
-  { id: "a2", type: "joined", title: "Aisha Bello joined your circle", meta: "Office KOLO", time: "5h ago", circleId: "office" },
-  { id: "a3", type: "payout", title: "Payout completed", meta: "Family Circle · ₦120,000 to Ngozi Eze", time: "Yesterday", circleId: "family" },
-  { id: "a4", type: "reminder", title: "Reminder sent to 4 members", meta: "Friends Savings", time: "Yesterday", circleId: "friends" },
-  { id: "a5", type: "overdue", title: "Kelechi Umeh is overdue", meta: "Friends Savings · ₦10,000", time: "2 days ago", circleId: "friends" },
-  { id: "a6", type: "created", title: "You created Family Circle", meta: "Monthly · 6 members", time: "1 month ago", circleId: "family" },
+  {
+    id: "inv1",
+    type: "invitation",
+    title: "You have been invited to join Ibadan Traders Ajo",
+    meta: "From Segun Owolabi · Weekly · ₦15,000",
+    time: "10m ago",
+    invite: { groupName: "Ibadan Traders Ajo", from: "Segun Owolabi", inviteCode: "IBTRA-2026", status: "pending" },
+  },
+  { id: "a1", type: "contribution", title: "Your contribution was received", meta: "Bodija Women Ajo · ₦10,000", time: "2h ago", circleId: "bodija-women" },
+  { id: "a2", type: "joined", title: "Aisha Bello joined your circle", meta: "Precious Member Ajo", time: "5h ago", circleId: "precious-member" },
+  { id: "a3", type: "payout", title: "Payout completed", meta: "Bodija Women Ajo · ₦100,000 to Ngozi Eze", time: "Yesterday", circleId: "bodija-women" },
+  { id: "a5", type: "overdue", title: "Kelechi Umeh is overdue", meta: "Bodija Women Ajo · ₦10,000", time: "2 days ago", circleId: "bodija-women" },
 ];
 
 const initialPayments: Payment[] = [
-  { id: "p1", circleId: "friends", circleName: "Friends Savings", amount: 10000, due: "Tomorrow", status: "upcoming" },
-  { id: "p2", circleId: "office", circleName: "Office KOLO", amount: 5000, due: "Friday", status: "upcoming" },
-  { id: "p3", circleId: "family", circleName: "Family Circle", amount: 20000, due: "In 5 days", status: "upcoming" },
-  { id: "p4", circleId: "friends", circleName: "Friends Savings", amount: 10000, due: "Last month", status: "paid" },
-  { id: "p5", circleId: "office", circleName: "Office KOLO", amount: 5000, due: "Last week", status: "paid" },
-  { id: "p6", circleId: "family", circleName: "Family Circle", amount: 20000, due: "3 weeks ago", status: "missed" },
+  { id: "p1", circleId: "bodija-women", circleName: "Bodija Women Ajo", amount: 10000, due: "Tomorrow", status: "upcoming" },
+  { id: "p2", circleId: "precious-member", circleName: "Precious Member Ajo", amount: 5000, due: "Friday", status: "upcoming" },
+  { id: "p4", circleId: "bodija-women", circleName: "Bodija Women Ajo", amount: 10000, due: "Last week", status: "paid" },
+  { id: "p5", circleId: "precious-member", circleName: "Precious Member Ajo", amount: 5000, due: "Last week", status: "paid" },
 ];
 
 interface AppState {
@@ -168,18 +163,46 @@ interface AppState {
   setDevMode: (v: boolean) => void;
   addCircle: (c: Omit<Circle, "id" | "members" | "cycle" | "nextDue" | "nextPayoutMember" | "createdAt">) => string;
   payContribution: (paymentId: string) => void;
+  respondInvitation: (id: string, action: "accepted" | "declined") => void;
+  resetOnboarding: () => void;
 }
 
 const AppCtx = createContext<AppState | null>(null);
 
+const STORAGE_KEY = "kolo_state_v1";
+
+type Persisted = { circles: Circle[]; activity: ActivityItem[]; payments: Payment[]; devMode: boolean };
+
+function loadPersisted(): Partial<Persisted> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) as Persisted;
+  } catch {
+    return {};
+  }
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [circles, setCircles] = useState(initialCircles);
-  const [activity, setActivity] = useState(initialActivity);
-  const [payments, setPayments] = useState(initialPayments);
-  const [devMode, setDevMode] = useState(false);
+  const persisted = typeof window !== "undefined" ? loadPersisted() : {};
+  const [circles, setCircles] = useState<Circle[]>(persisted.circles ?? initialCircles);
+  const [activity, setActivity] = useState<ActivityItem[]>(persisted.activity ?? initialActivity);
+  const [payments, setPayments] = useState<Payment[]>(persisted.payments ?? initialPayments);
+  const [devMode, setDevMode] = useState<boolean>(persisted.devMode ?? false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ circles, activity, payments, devMode } satisfies Persisted),
+      );
+    } catch { /* ignore */ }
+  }, [circles, activity, payments, devMode]);
 
   const addCircle: AppState["addCircle"] = (c) => {
-    const id = c.name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + Math.random().toString(36).slice(2, 6);
+    const id = c.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
     const newCircle: Circle = {
       ...c,
       id,
@@ -208,8 +231,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const respondInvitation: AppState["respondInvitation"] = (id, action) => {
+    setActivity((prev) =>
+      prev.map((a) =>
+        a.id === id && a.type === "invitation" && a.invite
+          ? { ...a, invite: { ...a.invite, status: action }, time: "Just now" }
+          : a,
+      ),
+    );
+  };
+
+  const resetOnboarding = () => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem("kolo_onboarded");
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch { /* ignore */ }
+  };
+
   return (
-    <AppCtx.Provider value={{ user: initialUser, circles, activity, payments, devMode, setDevMode, addCircle, payContribution }}>
+    <AppCtx.Provider
+      value={{
+        user: initialUser,
+        circles,
+        activity,
+        payments,
+        devMode,
+        setDevMode,
+        addCircle,
+        payContribution,
+        respondInvitation,
+        resetOnboarding,
+      }}
+    >
       {children}
     </AppCtx.Provider>
   );
