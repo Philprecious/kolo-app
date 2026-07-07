@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { ArrowLeft, QrCode, Link as LinkIcon, KeyRound } from "lucide-react";
+import { ArrowLeft, QrCode, Link as LinkIcon, KeyRound, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useApp } from "@/lib/store";
 
 export const Route = createFileRoute("/circles/join")({
   head: () => ({ meta: [{ title: "Join Circle — KOLO" }] }),
@@ -11,13 +12,30 @@ export const Route = createFileRoute("/circles/join")({
 
 function Join() {
   const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
+  const { circles } = useApp();
 
   const handleJoin = () => {
-    if (code.length < 4) return toast.error("Enter a valid code");
-    toast.success("Request sent to circle admin");
-    setTimeout(() => nav({ to: "/circles" }), 800);
+    const raw = code.trim().toUpperCase();
+    if (raw.length < 4) {
+      setError("Enter a valid invite code.");
+      return;
+    }
+    // Match against real circle IDs (first 6 chars uppercased) or full id
+    const match = circles.find(
+      (c) => c.id.slice(0, 6).toUpperCase() === raw || c.id.toUpperCase() === raw,
+    );
+    if (!match) {
+      setError("Group not found. Please verify the invite code and try again.");
+      toast.error("Group not found. Please verify the invite code and try again.");
+      return;
+    }
+    setError(null);
+    toast.success(`Request sent to ${match.name} admin`);
+    setTimeout(() => nav({ to: "/circles" }), 700);
   };
+
 
   return (
     <div>
@@ -38,16 +56,24 @@ function Join() {
           </div>
           <input
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onChange={(e) => { setCode(e.target.value.toUpperCase()); if (error) setError(null); }}
             placeholder="KOLO-XXXX"
-            className="w-full rounded-xl border border-border bg-background px-4 py-3.5 text-center text-lg font-bold tracking-widest outline-none focus:border-primary"
+            aria-invalid={!!error}
+            className={`w-full rounded-xl border bg-background px-4 py-3.5 text-center text-lg font-bold tracking-widest outline-none ${error ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
           />
+          {error && (
+            <div className="mt-2 flex items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2 text-[12px] font-semibold text-destructive">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
           <button
             onClick={handleJoin}
             className="mt-3 w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-btn"
           >
             Join circle
           </button>
+
         </div>
 
         <button className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4">

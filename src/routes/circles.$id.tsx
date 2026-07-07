@@ -2,6 +2,7 @@ import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp, naira } from "@/lib/store";
+import { QRModal } from "@/components/qr-modal";
 import {
   ArrowLeft, Copy, QrCode, UserPlus, Settings, BarChart3, XCircle,
   BellRing, CheckCircle2, ShieldCheck, Lock, ChevronDown, ChevronUp, Terminal, AlertOctagon, Crown,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/circles/$id")({
   head: () => ({ meta: [{ title: "Circle — KOLO" }] }),
   component: () => <AppShell><CircleDetail /></AppShell>,
 });
+
 
 // ---------- Kobo-safe money helpers (avoid FP drift) ----------
 const toKobo = (naira: number) => Math.round(naira * 100);
@@ -47,6 +49,8 @@ function CircleDetail() {
   const { circles, devMode } = useApp();
   const c = circles.find((x) => x.id === id);
   const [devOpen, setDevOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+
 
   const ledgers = useMemo(() => {
     if (!c) return [];
@@ -139,11 +143,12 @@ function CircleDetail() {
           <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Admin tools</p>
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: UserPlus, label: "Invite", onClick: () => toast.success("Invite link copied") },
-              { icon: QrCode, label: "QR Code" },
-              { icon: Settings, label: "Settings" },
-              { icon: BarChart3, label: "Analytics" },
+              { icon: UserPlus, label: "Invite", onClick: () => { navigator.clipboard.writeText(`https://kolo.ng/j/${c.id}`); toast.success("Invite link copied"); } },
+              { icon: QrCode, label: "QR Code", onClick: () => setQrOpen(true) },
+              { icon: Settings, label: "Settings", onClick: () => toast("Circle settings coming soon") },
+              { icon: BarChart3, label: "Analytics", onClick: () => toast("Analytics coming soon") },
             ].map((t) => (
+
               <button key={t.label} onClick={t.onClick} className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3">
                 <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary-soft text-primary">
                   <t.icon className="h-4 w-4" />
@@ -194,9 +199,10 @@ function CircleDetail() {
                   </div>
                   {l.state === "verified" && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-1 text-[10px] font-bold uppercase text-success">
-                      <CheckCircle2 className="h-3 w-3" /> Verified
+                      <CheckCircle2 className="h-3 w-3" /> Paid
                     </span>
                   )}
+
                   {l.state === "overpaid" && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-2.5 py-1 text-[10px] font-bold uppercase text-primary font-mono">
                       +{fmtKobo(l.deltaKobo)} credit
@@ -371,6 +377,14 @@ function CircleDetail() {
           </button>
         </section>
       )}
+
+      <QRModal
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+        title={`${c.name} · Virtual Account`}
+        value={`kolo:join?code=${c.id}`}
+      />
     </div>
   );
 }
+
