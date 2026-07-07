@@ -1,23 +1,33 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp } from "@/lib/store";
-import { ChevronRight, Shield, Bell, HelpCircle, LogOut, Settings, Copy, Terminal } from "lucide-react";
+import { ChevronRight, Shield, Bell, HelpCircle, LogOut, Settings, Copy, Terminal, RotateCcw, QrCode } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { QRModal } from "@/components/qr-modal";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export const Route = createFileRoute("/profile/")({
-  head: () => ({ meta: [{ title: "Profile — KOLO" }] }),
+  head: () => ({ meta: [{ title: "Settings — KOLO" }] }),
   component: () => <AppShell><Profile /></AppShell>,
 });
 
 function Profile() {
-  const { user, circles, devMode, setDevMode } = useApp();
+  const { user, circles, devMode, setDevMode, resetOnboarding } = useApp();
+  const nav = useNavigate();
+  const [qrOpen, setQrOpen] = useState(false);
   const adminCount = circles.filter((c) => c.role === "admin").length;
   const memberCount = circles.filter((c) => c.role === "member").length;
 
+  const doReset = () => {
+    resetOnboarding();
+    toast.success("Onboarding reset — restarting flow");
+    setTimeout(() => nav({ to: "/onboarding" }), 400);
+  };
+
   return (
     <div>
-      <PageHeader title="Profile" />
+      <PageHeader title="Settings" subtitle="Manage your KOLO account, security and developer tools." />
 
       <section className="px-5">
         <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
@@ -51,12 +61,21 @@ function Profile() {
               <p className="text-xl font-bold tracking-wider">{user.virtualAccount.number}</p>
               <p className="text-xs text-muted-foreground">{user.virtualAccount.name}</p>
             </div>
-            <button
-              onClick={() => { navigator.clipboard.writeText(user.virtualAccount.number); toast.success("Copied"); }}
-              className="grid h-9 w-9 place-items-center rounded-full bg-primary-soft text-primary"
-            >
-              <Copy className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setQrOpen(true)}
+                aria-label="Show QR code"
+                className="grid h-9 w-9 place-items-center rounded-full bg-gold-soft text-gold-foreground"
+              >
+                <QrCode className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => { navigator.clipboard.writeText(user.virtualAccount.number); toast.success("Copied"); }}
+                className="grid h-9 w-9 place-items-center rounded-full bg-primary-soft text-primary"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-success" /> Powered by Nomba Secure Payments
@@ -65,7 +84,7 @@ function Profile() {
       </section>
 
       <section className="mt-5 px-5">
-        <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Settings</p>
+        <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Preferences</p>
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           {[
             { icon: Settings, label: "Account settings" },
@@ -85,21 +104,37 @@ function Profile() {
       </section>
 
       <section className="mt-4 px-5">
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-foreground">
-            <Terminal className="h-4 w-4" />
+        <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Developer</p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-foreground">
+              <Terminal className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">Developer mode</p>
+              <p className="text-[11px] text-muted-foreground">Show the Nomba developer console & webhook audit stream on circle screens.</p>
+            </div>
+            <Switch
+              checked={devMode}
+              onCheckedChange={(v) => { setDevMode(v); toast.success(v ? "Developer mode on" : "Developer mode off"); }}
+            />
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Developer mode</p>
-            <p className="text-[11px] text-muted-foreground">Show the Nomba developer console & webhook audit stream on circle screens.</p>
-          </div>
-          <Switch
-            checked={devMode}
-            onCheckedChange={(v) => { setDevMode(v); toast.success(v ? "Developer mode on" : "Developer mode off"); }}
-          />
+
+          <button
+            onClick={doReset}
+            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-soft"
+          >
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-foreground">
+              <RotateCcw className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">Reset Onboarding Flow</p>
+              <p className="text-[11px] text-muted-foreground">Clears local flags and returns to the splash screens for testing.</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
         </div>
       </section>
-
 
       <section className="mt-4 px-5">
         <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-bold text-destructive">
@@ -107,6 +142,8 @@ function Profile() {
         </button>
         <p className="mt-4 text-center text-[11px] text-muted-foreground">KOLO · Powered by Nomba Secure Payments</p>
       </section>
+
+      <QRModal open={qrOpen} onOpenChange={setQrOpen} />
     </div>
   );
 }
