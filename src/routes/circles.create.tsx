@@ -46,7 +46,7 @@ function CreateWizard() {
     toast.success("Circle created 🎉");
   };
 
-  if (createdId) return <SuccessScreen id={createdId} name={name} onDone={() => nav({ to: "/circles/$id", params: { id: createdId } })} />;
+  if (createdId) return <SuccessScreen id={createdId} name={name} onDone={() => nav({ to: "/circles" })} />;
 
   return (
     <div className="pb-6">
