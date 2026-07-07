@@ -377,6 +377,14 @@ function CircleDetail() {
           </button>
         </section>
       )}
+
+      <QRModal
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+        title={`${c.name} · Virtual Account`}
+        value={`kolo:join?code=${c.id}`}
+      />
     </div>
   );
 }
+
