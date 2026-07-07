@@ -143,11 +143,12 @@ function CircleDetail() {
           <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Admin tools</p>
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: UserPlus, label: "Invite", onClick: () => toast.success("Invite link copied") },
-              { icon: QrCode, label: "QR Code" },
-              { icon: Settings, label: "Settings" },
-              { icon: BarChart3, label: "Analytics" },
+              { icon: UserPlus, label: "Invite", onClick: () => { navigator.clipboard.writeText(`https://kolo.ng/j/${c.id}`); toast.success("Invite link copied"); } },
+              { icon: QrCode, label: "QR Code", onClick: () => setQrOpen(true) },
+              { icon: Settings, label: "Settings", onClick: () => toast("Circle settings coming soon") },
+              { icon: BarChart3, label: "Analytics", onClick: () => toast("Analytics coming soon") },
             ].map((t) => (
+
               <button key={t.label} onClick={t.onClick} className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3">
                 <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary-soft text-primary">
                   <t.icon className="h-4 w-4" />
