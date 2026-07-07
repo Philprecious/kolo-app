@@ -2,6 +2,7 @@ import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp, naira } from "@/lib/store";
+import { QRModal } from "@/components/qr-modal";
 import {
   ArrowLeft, Copy, QrCode, UserPlus, Settings, BarChart3, XCircle,
   BellRing, CheckCircle2, ShieldCheck, Lock, ChevronDown, ChevronUp, Terminal, AlertOctagon, Crown,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/circles/$id")({
   head: () => ({ meta: [{ title: "Circle — KOLO" }] }),
   component: () => <AppShell><CircleDetail /></AppShell>,
 });
+
 
 // ---------- Kobo-safe money helpers (avoid FP drift) ----------
 const toKobo = (naira: number) => Math.round(naira * 100);
