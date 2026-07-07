@@ -231,9 +231,9 @@ function SuccessScreen({ id, name, onDone }: { id: string; name: string; onDone:
       </div>
 
       <button onClick={onDone} className="mt-6 w-full rounded-2xl bg-primary py-4 text-sm font-bold text-primary-foreground shadow-btn">
-        Open circle
+        Go to my circles
       </button>
-      <Link to="/circles" className="mt-3 text-xs font-semibold text-muted-foreground">Back to circles</Link>
+      <Link to="/circles/$id" params={{ id }} className="mt-3 text-xs font-semibold text-primary">Open {name}</Link>
     </div>
   );
 }
