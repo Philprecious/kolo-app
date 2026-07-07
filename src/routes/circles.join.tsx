@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
-import { ArrowLeft, QrCode, Link as LinkIcon, KeyRound } from "lucide-react";
+import { ArrowLeft, QrCode, Link as LinkIcon, KeyRound, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useApp } from "@/lib/store";
 
 export const Route = createFileRoute("/circles/join")({
   head: () => ({ meta: [{ title: "Join Circle — KOLO" }] }),
@@ -11,13 +12,30 @@ export const Route = createFileRoute("/circles/join")({
 
 function Join() {
   const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
+  const { circles } = useApp();
 
   const handleJoin = () => {
-    if (code.length < 4) return toast.error("Enter a valid code");
-    toast.success("Request sent to circle admin");
-    setTimeout(() => nav({ to: "/circles" }), 800);
+    const raw = code.trim().toUpperCase();
+    if (raw.length < 4) {
+      setError("Enter a valid invite code.");
+      return;
+    }
+    // Match against real circle IDs (first 6 chars uppercased) or full id
+    const match = circles.find(
+      (c) => c.id.slice(0, 6).toUpperCase() === raw || c.id.toUpperCase() === raw,
+    );
+    if (!match) {
+      setError("Group not found. Please verify the invite code and try again.");
+      toast.error("Group not found. Please verify the invite code and try again.");
+      return;
+    }
+    setError(null);
+    toast.success(`Request sent to ${match.name} admin`);
+    setTimeout(() => nav({ to: "/circles" }), 700);
   };
+
 
   return (
     <div>
