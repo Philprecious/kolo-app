@@ -49,6 +49,8 @@ function CircleDetail() {
   const { circles, devMode } = useApp();
   const c = circles.find((x) => x.id === id);
   const [devOpen, setDevOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+
 
   const ledgers = useMemo(() => {
     if (!c) return [];
