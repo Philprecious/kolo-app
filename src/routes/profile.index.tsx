@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { useApp } from "@/lib/store";
 import { ChevronRight, Shield, Bell, HelpCircle, LogOut, Settings, Copy, Terminal, RotateCcw, QrCode } from "lucide-react";
@@ -86,19 +86,23 @@ function Profile() {
       <section className="mt-5 px-5">
         <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Preferences</p>
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          {[
-            { icon: Settings, label: "Account settings" },
-            { icon: Shield, label: "Security & PIN" },
-            { icon: Bell, label: "Notifications" },
-            { icon: HelpCircle, label: "Help & support" },
-          ].map((it, i, arr) => (
-            <button key={it.label} className={`flex w-full items-center gap-3 px-4 py-3.5 text-left ${i < arr.length - 1 ? "border-b border-border" : ""}`}>
+          {([
+            { icon: Settings, label: "Account settings", to: "/profile/account" },
+            { icon: Shield, label: "Security & PIN", to: "/profile/security" },
+            { icon: Bell, label: "Notifications", to: "/profile/notifications" },
+            { icon: HelpCircle, label: "Help & support", to: "/profile/help" },
+          ] as const).map((it, i, arr) => (
+            <Link
+              key={it.label}
+              to={it.to}
+              className={`flex w-full items-center gap-3 px-4 py-3.5 text-left ${i < arr.length - 1 ? "border-b border-border" : ""}`}
+            >
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-foreground">
                 <it.icon className="h-4 w-4" />
               </div>
               <span className="flex-1 text-sm font-semibold">{it.label}</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
+            </Link>
           ))}
         </div>
       </section>
