@@ -225,12 +225,18 @@ function CircleDetail() {
                     <p className="text-[11px] font-semibold text-warning">
                       owes <span className="font-mono">{fmtKobo(-l.deltaKobo)}</span> · received {fmtKobo(l.receivedKobo)}
                     </p>
-                    <button
-                      onClick={() => toast.success(`Reminder sent to ${m.name}`)}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground shadow-btn"
-                    >
-                      <BellRing className="h-3 w-3" /> Remind
-                    </button>
+                    {c.role === "admin" ? (
+                      <button
+                        onClick={() => toast.success(`Reminder sent to ${m.name}`)}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground shadow-btn"
+                      >
+                        <BellRing className="h-3 w-3" /> Remind
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Admin can remind
+                      </span>
+                    )}
                   </div>
                 )}
                 {l.state === "overpaid" && (

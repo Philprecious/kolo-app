@@ -61,9 +61,16 @@ function Home() {
           <p className="text-sm text-muted-foreground">Good morning,</p>
           <h1 className="text-2xl font-bold">{user.name.split(" ")[0]} 👋</h1>
         </div>
-        <button className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-foreground">
+        <Link
+          to="/activity"
+          aria-label="View notifications"
+          className="relative grid h-11 w-11 place-items-center rounded-full bg-secondary text-foreground"
+        >
           <Bell className="h-5 w-5" />
-        </button>
+          {activity.some((a) => a.type === "invitation" && a.invite?.status === "pending") && (
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
+          )}
+        </Link>
       </header>
 
       {/* Hero contribution card */}
@@ -167,16 +174,21 @@ function Home() {
         </div>
         <div className="space-y-2">
           {activity.slice(0, 3).map((a) => (
-            <div key={a.id} className="flex items-center gap-3 rounded-2xl bg-card p-3.5 shadow-soft">
+            <Link
+              key={a.id}
+              to="/activity/$id"
+              params={{ id: a.id }}
+              className="flex items-center gap-3 rounded-2xl bg-card p-3.5 shadow-soft transition active:scale-[0.99]"
+            >
               <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary-soft text-lg">
-                {a.type === "contribution" ? "💰" : a.type === "joined" ? "🙌" : a.type === "payout" ? "🎉" : a.type === "reminder" ? "🔔" : "⚠️"}
+                {a.type === "contribution" ? "💰" : a.type === "joined" ? "🙌" : a.type === "payout" ? "🎉" : a.type === "reminder" ? "🔔" : a.type === "invitation" ? "✉️" : "⚠️"}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{a.title}</p>
                 <p className="truncate text-xs text-muted-foreground">{a.meta}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </div>
+            </Link>
           ))}
         </div>
       </section>
