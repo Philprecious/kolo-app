@@ -15,6 +15,10 @@ import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as PaymentsIndexRouteImport } from './routes/payments.index'
 import { Route as CirclesIndexRouteImport } from './routes/circles.index'
 import { Route as ActivityIndexRouteImport } from './routes/activity.index'
+import { Route as ProfileSecurityRouteImport } from './routes/profile.security'
+import { Route as ProfileNotificationsRouteImport } from './routes/profile.notifications'
+import { Route as ProfileHelpRouteImport } from './routes/profile.help'
+import { Route as ProfileAccountRouteImport } from './routes/profile.account'
 import { Route as CirclesJoinRouteImport } from './routes/circles.join'
 import { Route as CirclesCreateRouteImport } from './routes/circles.create'
 import { Route as CirclesIdRouteImport } from './routes/circles.$id'
@@ -23,6 +27,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthOtpRouteImport } from './routes/auth.otp'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as ActivityIdRouteImport } from './routes/activity.$id'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -52,6 +57,26 @@ const CirclesIndexRoute = CirclesIndexRouteImport.update({
 const ActivityIndexRoute = ActivityIndexRouteImport.update({
   id: '/activity/',
   path: '/activity/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileSecurityRoute = ProfileSecurityRouteImport.update({
+  id: '/profile/security',
+  path: '/profile/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileNotificationsRoute = ProfileNotificationsRouteImport.update({
+  id: '/profile/notifications',
+  path: '/profile/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileHelpRoute = ProfileHelpRouteImport.update({
+  id: '/profile/help',
+  path: '/profile/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileAccountRoute = ProfileAccountRouteImport.update({
+  id: '/profile/account',
+  path: '/profile/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CirclesJoinRoute = CirclesJoinRouteImport.update({
@@ -94,10 +119,16 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ActivityIdRoute = ActivityIdRouteImport.update({
+  id: '/activity/$id',
+  path: '/activity/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/activity/$id': typeof ActivityIdRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -106,6 +137,10 @@ export interface FileRoutesByFullPath {
   '/circles/$id': typeof CirclesIdRoute
   '/circles/create': typeof CirclesCreateRoute
   '/circles/join': typeof CirclesJoinRoute
+  '/profile/account': typeof ProfileAccountRoute
+  '/profile/help': typeof ProfileHelpRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
+  '/profile/security': typeof ProfileSecurityRoute
   '/activity/': typeof ActivityIndexRoute
   '/circles/': typeof CirclesIndexRoute
   '/payments/': typeof PaymentsIndexRoute
@@ -114,6 +149,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/activity/$id': typeof ActivityIdRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -122,6 +158,10 @@ export interface FileRoutesByTo {
   '/circles/$id': typeof CirclesIdRoute
   '/circles/create': typeof CirclesCreateRoute
   '/circles/join': typeof CirclesJoinRoute
+  '/profile/account': typeof ProfileAccountRoute
+  '/profile/help': typeof ProfileHelpRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
+  '/profile/security': typeof ProfileSecurityRoute
   '/activity': typeof ActivityIndexRoute
   '/circles': typeof CirclesIndexRoute
   '/payments': typeof PaymentsIndexRoute
@@ -131,6 +171,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/activity/$id': typeof ActivityIdRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -139,6 +180,10 @@ export interface FileRoutesById {
   '/circles/$id': typeof CirclesIdRoute
   '/circles/create': typeof CirclesCreateRoute
   '/circles/join': typeof CirclesJoinRoute
+  '/profile/account': typeof ProfileAccountRoute
+  '/profile/help': typeof ProfileHelpRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
+  '/profile/security': typeof ProfileSecurityRoute
   '/activity/': typeof ActivityIndexRoute
   '/circles/': typeof CirclesIndexRoute
   '/payments/': typeof PaymentsIndexRoute
@@ -149,6 +194,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/activity/$id'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/otp'
@@ -157,6 +203,10 @@ export interface FileRouteTypes {
     | '/circles/$id'
     | '/circles/create'
     | '/circles/join'
+    | '/profile/account'
+    | '/profile/help'
+    | '/profile/notifications'
+    | '/profile/security'
     | '/activity/'
     | '/circles/'
     | '/payments/'
@@ -165,6 +215,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/onboarding'
+    | '/activity/$id'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/otp'
@@ -173,6 +224,10 @@ export interface FileRouteTypes {
     | '/circles/$id'
     | '/circles/create'
     | '/circles/join'
+    | '/profile/account'
+    | '/profile/help'
+    | '/profile/notifications'
+    | '/profile/security'
     | '/activity'
     | '/circles'
     | '/payments'
@@ -181,6 +236,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/onboarding'
+    | '/activity/$id'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/otp'
@@ -189,6 +245,10 @@ export interface FileRouteTypes {
     | '/circles/$id'
     | '/circles/create'
     | '/circles/join'
+    | '/profile/account'
+    | '/profile/help'
+    | '/profile/notifications'
+    | '/profile/security'
     | '/activity/'
     | '/circles/'
     | '/payments/'
@@ -198,6 +258,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OnboardingRoute: typeof OnboardingRoute
+  ActivityIdRoute: typeof ActivityIdRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthOtpRoute: typeof AuthOtpRoute
@@ -206,6 +267,10 @@ export interface RootRouteChildren {
   CirclesIdRoute: typeof CirclesIdRoute
   CirclesCreateRoute: typeof CirclesCreateRoute
   CirclesJoinRoute: typeof CirclesJoinRoute
+  ProfileAccountRoute: typeof ProfileAccountRoute
+  ProfileHelpRoute: typeof ProfileHelpRoute
+  ProfileNotificationsRoute: typeof ProfileNotificationsRoute
+  ProfileSecurityRoute: typeof ProfileSecurityRoute
   ActivityIndexRoute: typeof ActivityIndexRoute
   CirclesIndexRoute: typeof CirclesIndexRoute
   PaymentsIndexRoute: typeof PaymentsIndexRoute
@@ -254,6 +319,34 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity/'
       preLoaderRoute: typeof ActivityIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/security': {
+      id: '/profile/security'
+      path: '/profile/security'
+      fullPath: '/profile/security'
+      preLoaderRoute: typeof ProfileSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/notifications': {
+      id: '/profile/notifications'
+      path: '/profile/notifications'
+      fullPath: '/profile/notifications'
+      preLoaderRoute: typeof ProfileNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/help': {
+      id: '/profile/help'
+      path: '/profile/help'
+      fullPath: '/profile/help'
+      preLoaderRoute: typeof ProfileHelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/account': {
+      id: '/profile/account'
+      path: '/profile/account'
+      fullPath: '/profile/account'
+      preLoaderRoute: typeof ProfileAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/circles/join': {
@@ -312,12 +405,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/activity/$id': {
+      id: '/activity/$id'
+      path: '/activity/$id'
+      fullPath: '/activity/$id'
+      preLoaderRoute: typeof ActivityIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OnboardingRoute: OnboardingRoute,
+  ActivityIdRoute: ActivityIdRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthOtpRoute: AuthOtpRoute,
@@ -326,6 +427,10 @@ const rootRouteChildren: RootRouteChildren = {
   CirclesIdRoute: CirclesIdRoute,
   CirclesCreateRoute: CirclesCreateRoute,
   CirclesJoinRoute: CirclesJoinRoute,
+  ProfileAccountRoute: ProfileAccountRoute,
+  ProfileHelpRoute: ProfileHelpRoute,
+  ProfileNotificationsRoute: ProfileNotificationsRoute,
+  ProfileSecurityRoute: ProfileSecurityRoute,
   ActivityIndexRoute: ActivityIndexRoute,
   CirclesIndexRoute: CirclesIndexRoute,
   PaymentsIndexRoute: PaymentsIndexRoute,
@@ -334,13 +439,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
