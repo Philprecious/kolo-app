@@ -129,8 +129,8 @@ function Onboarding() {
           <div className="flex h-full">
             {slides.map((s, i) => (
               <div key={i} className="flex h-full min-w-0 flex-[0_0_100%] flex-col">
-                {/* Illustration area (pale purple) */}
-                <div className="relative bg-primary-pale">
+                {/* Illustration area (pale lavender) */}
+                <div className="relative bg-[#EFEBF4]">
                   <div className="flex h-[52vh] items-end justify-center overflow-hidden">
                     <img
                       src={s.image}
@@ -139,24 +139,28 @@ function Onboarding() {
                       className="h-full w-auto object-contain"
                     />
                   </div>
-                  {/* Single dark purple ribbon curve, matching reference */}
+                  {/* Dark purple ribbon: dips low-mid, sweeps up to the
+                      top-right corner of the illustration area. */}
                   <svg
                     aria-hidden
-                    viewBox="0 0 440 90"
+                    viewBox="0 0 440 120"
                     preserveAspectRatio="none"
-                    className="absolute inset-x-0 -bottom-px h-[72px] w-full"
+                    className="absolute inset-x-0 -bottom-px h-[110px] w-full"
                   >
-                    {/* White area below the curved boundary */}
+                    {/* White area beneath the ribbon */}
                     <path
-                      d="M0,90 L440,90 L440,38 C360,26 260,72 150,74 C95,75 45,70 0,64 Z"
+                      d="M0,80 C120,96 220,92 300,68 C360,50 410,38 440,28 L440,120 L0,120 Z"
                       fill="white"
                     />
-                    {/* Dark purple ribbon following the curve */}
+                    {/* Purple ribbon band following the curve */}
                     <path
-                      d="M0,52 C45,58 95,63 150,62 C260,60 360,14 440,26 L440,38 C360,26 260,72 150,74 C95,75 45,70 0,64 Z"
+                      d="M0,40 C120,58 220,52 300,28 C360,12 410,4 440,0
+                         L440,28 C410,38 360,50 300,68 C220,92 120,96 0,80 Z"
                       className="fill-primary"
                     />
                   </svg>
+
+
                 </div>
 
                 {/* Text + CTA */}
@@ -203,6 +207,7 @@ function Onboarding() {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );
