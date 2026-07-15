@@ -144,16 +144,16 @@ function Onboarding() {
                     aria-hidden
                     viewBox="0 0 440 90"
                     preserveAspectRatio="none"
-                    className="absolute inset-x-0 -bottom-px h-[70px] w-full"
+                    className="absolute inset-x-0 -bottom-px h-[72px] w-full"
                   >
-                    {/* White base fills bottom; a curved top edge reveals pale-purple above */}
+                    {/* White area below the curved boundary */}
                     <path
-                      d="M0,90 L440,90 L440,20 C340,10 260,55 160,60 C110,62 60,55 0,50 Z"
+                      d="M0,90 L440,90 L440,38 C360,26 260,72 150,74 C95,75 45,70 0,64 Z"
                       fill="white"
                     />
-                    {/* Dark purple ribbon sitting on the boundary */}
+                    {/* Dark purple ribbon following the curve */}
                     <path
-                      d="M0,50 C60,55 110,62 160,60 C260,55 340,10 440,20 L440,40 C340,32 260,72 160,76 C110,78 60,72 0,68 Z"
+                      d="M0,52 C45,58 95,63 150,62 C260,60 360,14 440,26 L440,38 C360,26 260,72 150,74 C95,75 45,70 0,64 Z"
                       className="fill-primary"
                     />
                   </svg>
