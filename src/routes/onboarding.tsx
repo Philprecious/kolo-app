@@ -139,26 +139,27 @@ function Onboarding() {
                       className="h-full w-auto object-contain"
                     />
                   </div>
-                  {/* Dark purple ribbon: low on the left, sweeps up to the
+                  {/* Dark purple ribbon: dips low-mid, sweeps up to the
                       top-right corner of the illustration area. */}
                   <svg
                     aria-hidden
                     viewBox="0 0 440 90"
                     preserveAspectRatio="none"
-                    className="absolute inset-x-0 -bottom-px h-[70px] w-full"
+                    className="absolute inset-x-0 -bottom-px h-[80px] w-full"
                   >
                     {/* White area beneath the ribbon */}
                     <path
-                      d="M0,90 L440,90 L440,26 C380,30 300,50 220,58 C140,66 70,64 0,58 Z"
+                      d="M0,54 C120,66 220,62 300,46 C360,32 410,26 440,20 L440,90 L0,90 Z"
                       fill="white"
                     />
                     {/* Purple ribbon band following the curve */}
                     <path
-                      d="M0,40 C90,48 170,44 250,32 C330,20 390,10 440,4
-                         L440,26 C380,30 300,50 220,58 C140,66 70,64 0,58 Z"
+                      d="M0,32 C120,44 220,40 300,24 C360,14 410,6 440,0
+                         L440,20 C410,26 360,32 300,46 C220,62 120,66 0,54 Z"
                       className="fill-primary"
                     />
                   </svg>
+
                 </div>
 
                 {/* Text + CTA */}
