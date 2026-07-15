@@ -23,26 +23,28 @@ export function AuthShell({ children, footer }: Props) {
   return (
     <div className="min-h-dvh bg-white">
       <div className="relative mx-auto flex min-h-dvh max-w-[440px] flex-col bg-[#F5F1EA]">
-        <div className="flex-1 px-7 pt-14 pb-32">{children}</div>
+        <div className="flex-1 px-7 pt-14 pb-10">{children}</div>
 
-        {/* Purple wavy curve */}
+        {/* Purple wavy curve rising toward top-right, matching reference */}
         <div className="relative">
           <svg
             aria-hidden
-            viewBox="0 0 440 110"
+            viewBox="0 0 440 90"
             preserveAspectRatio="none"
-            className="block h-[90px] w-full"
+            className="block h-[70px] w-full"
           >
+            {/* Dark purple ribbon: low on the left, sweeps up to the top-right */}
             <path
-              d="M0,110 L0,70 C90,70 150,60 220,45 C300,28 360,10 440,25 L440,110 Z"
+              d="M0,58 C90,66 180,64 260,50 C330,38 385,18 440,4 L440,34 C385,44 330,60 260,70 C180,82 90,80 0,74 Z"
               className="fill-primary"
             />
+            {/* White area beneath the ribbon */}
             <path
-              d="M0,110 L0,92 C80,92 150,84 220,68 C300,50 360,32 440,45 L440,110 Z"
-              fill="#F5F1EA"
+              d="M0,74 C90,80 180,82 260,70 C330,60 385,44 440,34 L440,90 L0,90 Z"
+              fill="white"
             />
           </svg>
-          <div className="bg-white py-4 text-center text-sm text-neutral-500">
+          <div className="bg-white pb-6 pt-2 text-center text-sm text-neutral-500">
             {footer ?? defaultFooter}
           </div>
         </div>
