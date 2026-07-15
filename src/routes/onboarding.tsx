@@ -143,22 +143,23 @@ function Onboarding() {
                       top-right corner of the illustration area. */}
                   <svg
                     aria-hidden
-                    viewBox="0 0 440 90"
+                    viewBox="0 0 440 120"
                     preserveAspectRatio="none"
-                    className="absolute inset-x-0 -bottom-px h-[80px] w-full"
+                    className="absolute inset-x-0 -bottom-px h-[110px] w-full"
                   >
                     {/* White area beneath the ribbon */}
                     <path
-                      d="M0,54 C120,66 220,62 300,46 C360,32 410,26 440,20 L440,90 L0,90 Z"
+                      d="M0,80 C120,96 220,92 300,68 C360,50 410,38 440,28 L440,120 L0,120 Z"
                       fill="white"
                     />
                     {/* Purple ribbon band following the curve */}
                     <path
-                      d="M0,32 C120,44 220,40 300,24 C360,14 410,6 440,0
-                         L440,20 C410,26 360,32 300,46 C220,62 120,66 0,54 Z"
+                      d="M0,40 C120,58 220,52 300,28 C360,12 410,4 440,0
+                         L440,28 C410,38 360,50 300,68 C220,92 120,96 0,80 Z"
                       className="fill-primary"
                     />
                   </svg>
+
 
                 </div>
 
