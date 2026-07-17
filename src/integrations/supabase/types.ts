@@ -14,16 +14,346 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity: {
+        Row: {
+          circle_id: string | null
+          created_at: string
+          id: string
+          invite: Json | null
+          meta: string
+          title: string
+          type: Database["public"]["Enums"]["activity_type"]
+          user_id: string | null
+        }
+        Insert: {
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          invite?: Json | null
+          meta?: string
+          title: string
+          type: Database["public"]["Enums"]["activity_type"]
+          user_id?: string | null
+        }
+        Update: {
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          invite?: Json | null
+          meta?: string
+          title?: string
+          type?: Database["public"]["Enums"]["activity_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_members: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          initials: string
+          name: string
+          position: number
+          role: Database["public"]["Enums"]["circle_role"]
+          status: Database["public"]["Enums"]["member_status"]
+          user_id: string | null
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          initials: string
+          name: string
+          position: number
+          role?: Database["public"]["Enums"]["circle_role"]
+          status?: Database["public"]["Enums"]["member_status"]
+          user_id?: string | null
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          initials?: string
+          name?: string
+          position?: number
+          role?: Database["public"]["Enums"]["circle_role"]
+          status?: Database["public"]["Enums"]["member_status"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circles: {
+        Row: {
+          contribution_amount: number
+          created_at: string
+          created_by: string
+          current_cycle: number
+          description: string
+          frequency: Database["public"]["Enums"]["circle_frequency"]
+          id: string
+          max_members: number
+          name: string
+          next_due: string
+          next_payout_member: string
+          rotation: Database["public"]["Enums"]["circle_rotation"]
+          total_cycles: number
+        }
+        Insert: {
+          contribution_amount: number
+          created_at?: string
+          created_by: string
+          current_cycle?: number
+          description?: string
+          frequency?: Database["public"]["Enums"]["circle_frequency"]
+          id?: string
+          max_members?: number
+          name: string
+          next_due?: string
+          next_payout_member?: string
+          rotation?: Database["public"]["Enums"]["circle_rotation"]
+          total_cycles?: number
+        }
+        Update: {
+          contribution_amount?: number
+          created_at?: string
+          created_by?: string
+          current_cycle?: number
+          description?: string
+          frequency?: Database["public"]["Enums"]["circle_frequency"]
+          id?: string
+          max_members?: number
+          name?: string
+          next_due?: string
+          next_payout_member?: string
+          rotation?: Database["public"]["Enums"]["circle_rotation"]
+          total_cycles?: number
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          circle_id: string
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          circle_id: string
+          code: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          circle_id?: string
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          circle_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          circle_id: string
+          created_at: string
+          due: string
+          id: string
+          member_id: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+        }
+        Insert: {
+          amount: number
+          circle_id: string
+          created_at?: string
+          due: string
+          id?: string
+          member_id: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+        }
+        Update: {
+          amount?: number
+          circle_id?: string
+          created_at?: string
+          due?: string
+          id?: string
+          member_id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "circle_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          notify_email: boolean
+          notify_push: boolean
+          notify_reminders: boolean
+          onboarded: boolean
+          phone: string | null
+          pin_hash: string | null
+          updated_at: string
+          virtual_account_name: string
+          virtual_account_number: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_reminders?: boolean
+          onboarded?: boolean
+          phone?: string | null
+          pin_hash?: string | null
+          updated_at?: string
+          virtual_account_name?: string
+          virtual_account_number?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_reminders?: boolean
+          onboarded?: boolean
+          phone?: string | null
+          pin_hash?: string | null
+          updated_at?: string
+          virtual_account_name?: string
+          virtual_account_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_circle_admin: {
+        Args: { _circle_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_circle_member: {
+        Args: { _circle_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      activity_type:
+        | "contribution"
+        | "joined"
+        | "payout"
+        | "reminder"
+        | "overdue"
+        | "created"
+        | "invitation"
+        | "notified"
+      circle_frequency: "Weekly" | "Monthly" | "Custom"
+      circle_role: "admin" | "member"
+      circle_rotation: "Random" | "Manual" | "Fixed Order"
+      member_status: "paid" | "pending" | "overdue"
+      payment_status: "upcoming" | "paid" | "missed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +480,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_type: [
+        "contribution",
+        "joined",
+        "payout",
+        "reminder",
+        "overdue",
+        "created",
+        "invitation",
+        "notified",
+      ],
+      circle_frequency: ["Weekly", "Monthly", "Custom"],
+      circle_role: ["admin", "member"],
+      circle_rotation: ["Random", "Manual", "Fixed Order"],
+      member_status: ["paid", "pending", "overdue"],
+      payment_status: ["upcoming", "paid", "missed"],
+    },
   },
 } as const
