@@ -13,16 +13,21 @@ export const Route = createFileRoute("/profile/")({
 });
 
 function Profile() {
-  const { user, circles, devMode, setDevMode, resetOnboarding } = useApp();
+  const { user, circles, devMode, setDevMode, resetOnboarding, signOut } = useApp();
   const nav = useNavigate();
   const [qrOpen, setQrOpen] = useState(false);
   const adminCount = circles.filter((c) => c.role === "admin").length;
   const memberCount = circles.filter((c) => c.role === "member").length;
 
-  const doReset = () => {
-    resetOnboarding();
+  const doReset = async () => {
+    await resetOnboarding();
     toast.success("Onboarding reset — restarting flow");
     setTimeout(() => nav({ to: "/onboarding" }), 400);
+  };
+
+  const doSignOut = async () => {
+    await signOut();
+    nav({ to: "/auth/login", replace: true });
   };
 
   return (
@@ -141,7 +146,7 @@ function Profile() {
       </section>
 
       <section className="mt-4 px-5">
-        <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-bold text-destructive">
+        <button onClick={doSignOut} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-bold text-destructive">
           <LogOut className="h-4 w-4" /> Log out
         </button>
         <p className="mt-4 text-center text-[11px] text-muted-foreground">KOLO · Powered by Nomba Secure Payments</p>

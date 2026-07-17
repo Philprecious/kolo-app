@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth/signup")({
   head: () => ({
@@ -20,10 +22,25 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try { localStorage.setItem("kolo_onboarded", "true"); } catch { /* ignore */ }
+    if (!name || !email || password.length < 6) {
+      toast.error("Enter a name, email and password (6+ chars).");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+        data: { display_name: name },
+      },
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Account created 🎉");
     navigate({ to: "/" });
   };
 
@@ -40,6 +57,7 @@ function SignupPage() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Philip Precious"
             className="auth-input"
+            autoComplete="name"
           />
         </Field>
         <Field label="Email">
@@ -49,6 +67,7 @@ function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="example@gmail.com"
             className="auth-input"
+            autoComplete="email"
           />
         </Field>
         <Field label="Password">
@@ -59,6 +78,7 @@ function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
               className="auth-input pr-12"
+              autoComplete="new-password"
             />
             <button
               type="button"
@@ -83,16 +103,22 @@ function SignupPage() {
 
         <button
           type="submit"
-          className="mt-6 w-full rounded-full bg-primary py-4 text-base font-bold text-white transition active:scale-[0.98]"
+          disabled={busy}
+          className="mt-6 w-full rounded-full bg-primary py-4 text-base font-bold text-white transition active:scale-[0.98] disabled:opacity-60"
         >
-          Get Started
+          {busy ? "Creating…" : "Get Started"}
         </button>
+        <p className="text-center text-xs text-neutral-500">
+          Already have an account?{" "}
+          <Link to="/auth/login" className="font-semibold text-primary">Sign In</Link>
+        </p>
       </form>
 
       <SocialSection />
     </AuthShell>
   );
 }
+
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

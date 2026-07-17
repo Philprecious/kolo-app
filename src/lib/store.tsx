@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { Session, User as SupabaseUser } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Role = "admin" | "member";
 export type Frequency = "Weekly" | "Monthly" | "Custom";
@@ -10,6 +12,7 @@ export interface Member {
   initials: string;
   status: MemberStatus;
   position: number;
+  userId: string | null;
 }
 
 export interface Circle {
@@ -31,12 +34,11 @@ export interface Circle {
 
 export interface ActivityItem {
   id: string;
-  type: "contribution" | "joined" | "payout" | "reminder" | "overdue" | "created" | "invitation";
+  type: "contribution" | "joined" | "payout" | "reminder" | "overdue" | "created" | "invitation" | "notified";
   title: string;
   meta: string;
   time: string;
   circleId?: string;
-  // invitation-only
   invite?: {
     groupName: string;
     from: string;
@@ -54,216 +56,354 @@ export interface Payment {
   status: "upcoming" | "paid" | "missed";
 }
 
+export interface NotificationItem {
+  id: string;
+  title: string;
+  body: string;
+  kind: string;
+  circleId: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
 export interface User {
+  id: string;
   name: string;
   phone: string;
   email: string;
   initials: string;
-  virtualAccount: {
-    number: string;
-    bank: string;
-    name: string;
-  };
+  onboarded: boolean;
+  notifyEmail: boolean;
+  notifyPush: boolean;
+  notifyReminders: boolean;
+  hasPin: boolean;
+  virtualAccount: { number: string; bank: string; name: string };
 }
 
-const initialUser: User = {
-  name: "Philip Precious",
-  phone: "+234 803 555 0114",
-  email: "philip@kolo.ng",
-  initials: "PP",
-  virtualAccount: {
-    number: "8021340977",
-    bank: "Nomba Virtual Account",
-    name: "PHILIP PRECIOUS / KOLO",
-  },
+const guestUser: User = {
+  id: "",
+  name: "Guest",
+  phone: "",
+  email: "",
+  initials: "GU",
+  onboarded: false,
+  notifyEmail: true,
+  notifyPush: true,
+  notifyReminders: true,
+  hasPin: false,
+  virtualAccount: { number: "", bank: "Nomba Virtual Account", name: "" },
 };
-
-const seedMembers = (n: number, paidCount: number): Member[] => {
-  const names = [
-    "Philip Precious", "Tunde Bakare", "Chioma Okafor", "Kelechi Umeh",
-    "Aisha Bello", "Segun Owolabi", "Ngozi Eze", "Yusuf Musa",
-    "Zainab Kola", "Deji Ade", "Ifeanyi Obi", "Halima Bala",
-  ];
-  return Array.from({ length: n }, (_, i) => {
-    const name = names[i % names.length];
-    const parts = name.split(" ");
-    return {
-      id: `m${i}`,
-      name,
-      initials: (parts[0][0] + parts[1][0]).toUpperCase(),
-      status: i < paidCount ? "paid" : "pending",
-      position: i + 1,
-    } as Member;
-  });
-};
-
-const initialCircles: Circle[] = [
-  {
-    id: "bodija-women",
-    name: "Bodija Women Ajo",
-    description: "Weekly market Ajo for the Bodija women's cooperative.",
-    role: "admin",
-    amount: 10000,
-    frequency: "Weekly",
-    maxMembers: 10,
-    rotation: "Fixed Order",
-    members: seedMembers(10, 6),
-    cycle: 4,
-    totalCycles: 10,
-    nextDue: "Tomorrow",
-    nextPayoutMember: "Chioma Okafor",
-    createdAt: "2 months ago",
-  },
-  {
-    id: "precious-member",
-    name: "Precious Member Ajo",
-    description: "Rotating target-savings circle amongst trusted members.",
-    role: "member",
-    amount: 5000,
-    frequency: "Weekly",
-    maxMembers: 10,
-    rotation: "Random",
-    members: seedMembers(10, 8),
-    cycle: 7,
-    totalCycles: 10,
-    nextDue: "Friday",
-    nextPayoutMember: "You",
-    createdAt: "3 weeks ago",
-  },
-];
-
-const initialActivity: ActivityItem[] = [
-  {
-    id: "inv1",
-    type: "invitation",
-    title: "You have been invited to join Ibadan Traders Ajo",
-    meta: "From Segun Owolabi · Weekly · ₦15,000",
-    time: "10m ago",
-    invite: { groupName: "Ibadan Traders Ajo", from: "Segun Owolabi", inviteCode: "IBTRA-2026", status: "pending" },
-  },
-  { id: "a1", type: "contribution", title: "Your contribution was received", meta: "Bodija Women Ajo · ₦10,000", time: "2h ago", circleId: "bodija-women" },
-  { id: "a2", type: "joined", title: "Aisha Bello joined your circle", meta: "Precious Member Ajo", time: "5h ago", circleId: "precious-member" },
-  { id: "a3", type: "payout", title: "Payout completed", meta: "Bodija Women Ajo · ₦100,000 to Ngozi Eze", time: "Yesterday", circleId: "bodija-women" },
-  { id: "a5", type: "overdue", title: "Kelechi Umeh is overdue", meta: "Bodija Women Ajo · ₦10,000", time: "2 days ago", circleId: "bodija-women" },
-];
-
-const initialPayments: Payment[] = [
-  { id: "p1", circleId: "bodija-women", circleName: "Bodija Women Ajo", amount: 10000, due: "Tomorrow", status: "upcoming" },
-  { id: "p2", circleId: "precious-member", circleName: "Precious Member Ajo", amount: 5000, due: "Friday", status: "upcoming" },
-  { id: "p4", circleId: "bodija-women", circleName: "Bodija Women Ajo", amount: 10000, due: "Last week", status: "paid" },
-  { id: "p5", circleId: "precious-member", circleName: "Precious Member Ajo", amount: 5000, due: "Last week", status: "paid" },
-];
 
 interface AppState {
+  loading: boolean;
+  session: Session | null;
+  supaUser: SupabaseUser | null;
   user: User;
   circles: Circle[];
   activity: ActivityItem[];
   payments: Payment[];
+  notifications: NotificationItem[];
+  unreadCount: number;
   devMode: boolean;
   setDevMode: (v: boolean) => void;
-  addCircle: (c: Omit<Circle, "id" | "members" | "cycle" | "nextDue" | "nextPayoutMember" | "createdAt">) => string;
-  payContribution: (paymentId: string) => void;
+  addCircle: (c: Omit<Circle, "id" | "members" | "cycle" | "nextDue" | "nextPayoutMember" | "createdAt">) => Promise<string | null>;
+  payContribution: (paymentId: string) => Promise<void>;
   respondInvitation: (id: string, action: "accepted" | "declined") => void;
-  resetOnboarding: () => void;
+  notifyUnpaid: (circleId: string) => Promise<number>;
+  markAllNotificationsRead: () => Promise<void>;
+  updateProfile: (patch: Partial<{ display_name: string; phone: string; notify_email: boolean; notify_push: boolean; notify_reminders: boolean; onboarded: boolean; pin_hash: string }>) => Promise<void>;
+  refresh: () => Promise<void>;
+  signOut: () => Promise<void>;
+  resetOnboarding: () => Promise<void>;
 }
 
 const AppCtx = createContext<AppState | null>(null);
 
-const STORAGE_KEY = "kolo_state_v1";
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0 || !parts[0]) return "KO";
+  const a = parts[0][0] ?? "K";
+  const b = parts[1]?.[0] ?? parts[0][1] ?? "O";
+  return (a + b).toUpperCase();
+}
 
-type Persisted = { circles: Circle[]; activity: ActivityItem[]; payments: Payment[]; devMode: boolean };
-
-function loadPersisted(): Partial<Persisted> {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as Persisted;
-  } catch {
-    return {};
-  }
+function relTime(iso: string) {
+  const d = new Date(iso).getTime();
+  const diff = (Date.now() - d) / 1000;
+  if (diff < 60) return "Just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 172800) return "Yesterday";
+  return `${Math.floor(diff / 86400)} days ago`;
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const persisted = typeof window !== "undefined" ? loadPersisted() : {};
-  const [circles, setCircles] = useState<Circle[]>(persisted.circles ?? initialCircles);
-  const [activity, setActivity] = useState<ActivityItem[]>(persisted.activity ?? initialActivity);
-  const [payments, setPayments] = useState<Payment[]>(persisted.payments ?? initialPayments);
-  const [devMode, setDevMode] = useState<boolean>(persisted.devMode ?? false);
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
+  const [supaUser, setSupaUser] = useState<SupabaseUser | null>(null);
+  const [user, setUser] = useState<User>(guestUser);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [devMode, setDevMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("kolo_dev_mode") === "1"; } catch { return false; }
+  });
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ circles, activity, payments, devMode } satisfies Persisted),
-      );
-    } catch { /* ignore */ }
-  }, [circles, activity, payments, devMode]);
+    if (typeof window !== "undefined") {
+      try { window.localStorage.setItem("kolo_dev_mode", devMode ? "1" : "0"); } catch { /* ignore */ }
+    }
+  }, [devMode]);
 
-  const addCircle: AppState["addCircle"] = (c) => {
-    const id = c.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
-    const newCircle: Circle = {
-      ...c,
-      id,
-      members: [{ id: "m0", name: "Philip Precious (You)", initials: "PP", status: "paid", position: 1 }],
-      cycle: 1,
-      nextDue: "In 7 days",
-      nextPayoutMember: "You",
-      createdAt: "Just now",
-    };
-    setCircles((prev) => [newCircle, ...prev]);
-    setActivity((prev) => [
-      { id: `a${Date.now()}`, type: "created", title: `You created ${c.name}`, meta: `${c.frequency} · ${c.maxMembers} members`, time: "Just now", circleId: id },
-      ...prev,
-    ]);
-    return id;
+  const fetchAll = useCallback(async (uid: string, sess: Session | null) => {
+    // Profile
+    const { data: prof } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
+    const email = sess?.user.email ?? "";
+    if (prof) {
+      setUser({
+        id: uid,
+        name: prof.display_name || email.split("@")[0] || "You",
+        phone: prof.phone ?? "",
+        email,
+        initials: initials(prof.display_name || email),
+        onboarded: prof.onboarded,
+        notifyEmail: prof.notify_email,
+        notifyPush: prof.notify_push,
+        notifyReminders: prof.notify_reminders,
+        hasPin: !!prof.pin_hash,
+        virtualAccount: {
+          number: prof.virtual_account_number,
+          bank: "Nomba Virtual Account",
+          name: prof.virtual_account_name,
+        },
+      });
+    }
+
+    // Circles + members
+    const { data: circleRows } = await supabase.from("circles").select("*").order("created_at", { ascending: false });
+    const circleIds = (circleRows ?? []).map((c) => c.id);
+    const { data: memberRows } = circleIds.length
+      ? await supabase.from("circle_members").select("*").in("circle_id", circleIds).order("position")
+      : { data: [] as never[] };
+    const { data: paymentRows } = circleIds.length
+      ? await supabase.from("payments").select("*").in("circle_id", circleIds).order("created_at", { ascending: false })
+      : { data: [] as never[] };
+
+    const memsByCircle = new Map<string, Member[]>();
+    for (const m of memberRows ?? []) {
+      const arr = memsByCircle.get(m.circle_id) ?? [];
+      arr.push({
+        id: m.id, name: m.name, initials: m.initials, status: m.status as MemberStatus,
+        position: m.position, userId: m.user_id,
+      });
+      memsByCircle.set(m.circle_id, arr);
+    }
+
+    const mappedCircles: Circle[] = (circleRows ?? []).map((c) => {
+      const mems = memsByCircle.get(c.id) ?? [];
+      const myRole = mems.find((m) => m.userId === uid)?.name ? mems.find((m) => m.userId === uid)! : null;
+      const role: Role = mems.find((m) => m.userId === uid)?.userId === uid
+        ? (memberRows!.find((mm) => mm.circle_id === c.id && mm.user_id === uid)?.role as Role) ?? "member"
+        : "member";
+      void myRole;
+      return {
+        id: c.id, name: c.name, description: c.description,
+        role,
+        amount: c.contribution_amount,
+        frequency: c.frequency as Frequency,
+        maxMembers: c.max_members,
+        rotation: c.rotation as Circle["rotation"],
+        members: mems,
+        cycle: c.current_cycle,
+        totalCycles: c.total_cycles,
+        nextDue: c.next_due,
+        nextPayoutMember: c.next_payout_member,
+        createdAt: relTime(c.created_at),
+      };
+    });
+    setCircles(mappedCircles);
+
+    const circleNameById = new Map(mappedCircles.map((c) => [c.id, c.name]));
+    setPayments((paymentRows ?? []).map((p) => ({
+      id: p.id,
+      circleId: p.circle_id,
+      circleName: circleNameById.get(p.circle_id) ?? "Circle",
+      amount: p.amount,
+      due: p.due,
+      status: p.status as Payment["status"],
+    })));
+
+    // Activity (limit 50)
+    const { data: actRows } = await supabase
+      .from("activity")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setActivity((actRows ?? []).map((a) => ({
+      id: a.id,
+      type: a.type as ActivityItem["type"],
+      title: a.title,
+      meta: a.meta,
+      time: relTime(a.created_at),
+      circleId: a.circle_id ?? undefined,
+      invite: a.invite as ActivityItem["invite"],
+    })));
+
+    // Notifications
+    const { data: notes } = await supabase
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setNotifications((notes ?? []).map((n) => ({
+      id: n.id, title: n.title, body: n.body, kind: n.kind,
+      circleId: n.circle_id, readAt: n.read_at, createdAt: n.created_at,
+    })));
+  }, []);
+
+  const refresh = useCallback(async () => {
+    if (supaUser) await fetchAll(supaUser.id, session);
+  }, [fetchAll, supaUser, session]);
+
+  // Auth bootstrap
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session);
+      setSupaUser(data.session?.user ?? null);
+      if (data.session?.user) {
+        fetchAll(data.session.user.id, data.session).finally(() => mounted && setLoading(false));
+      } else {
+        setLoading(false);
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+      setSession(sess);
+      setSupaUser(sess?.user ?? null);
+      if (sess?.user) {
+        setLoading(true);
+        fetchAll(sess.user.id, sess).finally(() => setLoading(false));
+      } else {
+        setUser(guestUser);
+        setCircles([]); setActivity([]); setPayments([]); setNotifications([]);
+        setLoading(false);
+      }
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, [fetchAll]);
+
+  const addCircle: AppState["addCircle"] = async (c) => {
+    if (!supaUser) return null;
+    const { data: inserted, error } = await supabase.from("circles").insert({
+      name: c.name, description: c.description,
+      contribution_amount: c.amount, frequency: c.frequency,
+      max_members: c.maxMembers, rotation: c.rotation,
+      total_cycles: c.totalCycles, current_cycle: 1,
+      next_due: "In 7 days", next_payout_member: user.name,
+      created_by: supaUser.id,
+    }).select().single();
+    if (error || !inserted) return null;
+
+    await supabase.from("circle_members").insert({
+      circle_id: inserted.id, user_id: supaUser.id,
+      name: `${user.name} (You)`, initials: user.initials,
+      position: 1, role: "admin", status: "paid",
+    });
+    await supabase.from("activity").insert({
+      circle_id: inserted.id, user_id: supaUser.id,
+      type: "created", title: `You created ${c.name}`,
+      meta: `${c.frequency} · ${c.maxMembers} members`,
+    });
+    await refresh();
+    return inserted.id;
   };
 
-  const payContribution = (paymentId: string) => {
-    setPayments((prev) => prev.map((p) => (p.id === paymentId ? { ...p, status: "paid" } : p)));
+  const payContribution: AppState["payContribution"] = async (paymentId) => {
     const p = payments.find((x) => x.id === paymentId);
-    if (p) {
-      setActivity((prev) => [
-        { id: `a${Date.now()}`, type: "contribution", title: "Your contribution was received", meta: `${p.circleName} · ₦${p.amount.toLocaleString()}`, time: "Just now", circleId: p.circleId },
-        ...prev,
-      ]);
-    }
+    if (!p || !supaUser) return;
+    await supabase.from("payments").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", paymentId);
+    await supabase.from("activity").insert({
+      circle_id: p.circleId, user_id: supaUser.id,
+      type: "contribution",
+      title: "Your contribution was received",
+      meta: `${p.circleName} · ₦${p.amount.toLocaleString()}`,
+    });
+    await refresh();
   };
 
   const respondInvitation: AppState["respondInvitation"] = (id, action) => {
-    setActivity((prev) =>
-      prev.map((a) =>
-        a.id === id && a.type === "invitation" && a.invite
-          ? { ...a, invite: { ...a.invite, status: action }, time: "Just now" }
-          : a,
-      ),
-    );
+    setActivity((prev) => prev.map((a) => a.id === id && a.invite ? { ...a, invite: { ...a.invite, status: action } } : a));
   };
 
-  const resetOnboarding = () => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.removeItem("kolo_onboarded");
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch { /* ignore */ }
+  const notifyUnpaid: AppState["notifyUnpaid"] = async (circleId) => {
+    if (!supaUser) return 0;
+    const circle = circles.find((c) => c.id === circleId);
+    if (!circle || circle.role !== "admin") return 0;
+    // Find pending/overdue member user_ids from DB
+    const { data: unpaid } = await supabase
+      .from("circle_members")
+      .select("user_id, name")
+      .eq("circle_id", circleId)
+      .neq("status", "paid")
+      .not("user_id", "is", null);
+    const rows = (unpaid ?? []).filter((m) => m.user_id && m.user_id !== supaUser.id);
+    if (rows.length === 0) {
+      await supabase.from("activity").insert({
+        circle_id: circleId, user_id: supaUser.id,
+        type: "notified", title: "No unpaid members to notify", meta: circle.name,
+      });
+      await refresh();
+      return 0;
+    }
+    await supabase.from("notifications").insert(rows.map((r) => ({
+      user_id: r.user_id!, circle_id: circleId,
+      kind: "reminder",
+      title: `Payment reminder for ${circle.name}`,
+      body: `Your contribution of ₦${circle.amount.toLocaleString()} is due (${circle.nextDue}).`,
+    })));
+    await supabase.from("activity").insert({
+      circle_id: circleId, user_id: supaUser.id,
+      type: "notified",
+      title: `Reminders sent to ${rows.length} member${rows.length === 1 ? "" : "s"}`,
+      meta: circle.name,
+    });
+    await refresh();
+    return rows.length;
   };
+
+  const markAllNotificationsRead: AppState["markAllNotificationsRead"] = async () => {
+    if (!supaUser) return;
+    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).is("read_at", null).eq("user_id", supaUser.id);
+    setNotifications((prev) => prev.map((n) => n.readAt ? n : { ...n, readAt: new Date().toISOString() }));
+  };
+
+  const updateProfile: AppState["updateProfile"] = async (patch) => {
+    if (!supaUser) return;
+    await supabase.from("profiles").update(patch).eq("id", supaUser.id);
+    await refresh();
+  };
+
+  const signOut = async () => { await supabase.auth.signOut(); };
+
+  const resetOnboarding = async () => {
+    if (!supaUser) return;
+    await supabase.from("profiles").update({ onboarded: false }).eq("id", supaUser.id);
+    await refresh();
+  };
+
+  const unreadCount = useMemo(() => notifications.filter((n) => !n.readAt).length, [notifications]);
 
   return (
-    <AppCtx.Provider
-      value={{
-        user: initialUser,
-        circles,
-        activity,
-        payments,
-        devMode,
-        setDevMode,
-        addCircle,
-        payContribution,
-        respondInvitation,
-        resetOnboarding,
-      }}
-    >
+    <AppCtx.Provider value={{
+      loading, session, supaUser, user,
+      circles, activity, payments, notifications, unreadCount,
+      devMode, setDevMode,
+      addCircle, payContribution, respondInvitation, notifyUnpaid,
+      markAllNotificationsRead, updateProfile, refresh, signOut, resetOnboarding,
+    }}>
       {children}
     </AppCtx.Provider>
   );

@@ -37,11 +37,12 @@ function CreateWizard() {
     step === 4 ||
     step === 5;
 
-  const submit = () => {
-    const id = addCircle({
+  const submit = async () => {
+    const id = await addCircle({
       name, description, amount, frequency, maxMembers, rotation,
       role: "admin", totalCycles: maxMembers,
     });
+    if (!id) { toast.error("Couldn't create circle. Try again."); return; }
     setCreatedId(id);
     toast.success("Circle created 🎉");
   };
