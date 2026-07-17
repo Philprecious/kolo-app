@@ -1,5 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { useApp, naira } from "@/lib/store";
 import {
@@ -16,37 +15,17 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Modern Ajo, Esusu and contribution circles for Nigerians. Powered by Nomba." },
     ],
   }),
-  component: IndexRoute,
+  component: () => <AppShell><Home /></AppShell>,
 });
-
-function IndexRoute() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    let seen = false;
-    try {
-      const v = localStorage.getItem("kolo_onboarded");
-      seen = v === "true" || v === "1";
-    } catch {
-      /* ignore */
-    }
-    if (!seen) {
-      navigate({ to: "/onboarding", replace: true });
-    } else {
-      setReady(true);
-    }
-  }, [navigate]);
-  if (!ready) return <div className="min-h-dvh bg-primary-pale" />;
-  return <AppShell><Home /></AppShell>;
-}
 
 
 function Home() {
-  const { user, circles, activity, payments } = useApp();
-  const nextPayment = payments.find((p) => p.status === "upcoming")!;
-  const nextCircle = circles.find((c) => c.id === nextPayment.circleId)!;
-  const paidCount = nextCircle.members.filter((m) => m.status === "paid").length;
-  const progress = (paidCount / nextCircle.members.length) * 100;
+  const { user, circles, activity, payments, unreadCount } = useApp();
+  const nextPayment = payments.find((p) => p.status === "upcoming");
+  const nextCircle = nextPayment ? circles.find((c) => c.id === nextPayment.circleId) : undefined;
+  const paidCount = nextCircle ? nextCircle.members.filter((m) => m.status === "paid").length : 0;
+  const totalMembers = nextCircle?.members.length || 1;
+  const progress = (paidCount / totalMembers) * 100;
 
   const copyAcct = () => {
     navigator.clipboard.writeText(user.virtualAccount.number);
