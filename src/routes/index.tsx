@@ -46,7 +46,7 @@ function Home() {
           className="relative grid h-11 w-11 place-items-center rounded-full bg-secondary text-foreground"
         >
           <Bell className="h-5 w-5" />
-          {activity.some((a) => a.type === "invitation" && a.invite?.status === "pending") && (
+          {unreadCount > 0 && (
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
           )}
         </Link>
@@ -61,30 +61,43 @@ function Home() {
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70">
               <Sparkles className="h-3.5 w-3.5" /> Your contribution is due
             </div>
-            <p className="mt-4 text-4xl font-bold tracking-tight">{naira(nextPayment.amount)}</p>
-            <p className="mt-1 text-sm text-white/80">
-              {nextCircle.name} · Due {nextPayment.due}
-            </p>
+            {nextPayment && nextCircle ? (
+              <>
+                <p className="mt-4 text-4xl font-bold tracking-tight">{naira(nextPayment.amount)}</p>
+                <p className="mt-1 text-sm text-white/80">
+                  {nextCircle.name} · Due {nextPayment.due}
+                </p>
 
-            <div className="mt-5 space-y-2">
-              <div className="flex justify-between text-xs text-white/80">
-                <span>{paidCount} of {nextCircle.members.length} members contributed</span>
-                <span>{Math.round(progress)}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/20">
-                <div className="h-full rounded-full bg-gold transition-all" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
+                <div className="mt-5 space-y-2">
+                  <div className="flex justify-between text-xs text-white/80">
+                    <span>{paidCount} of {totalMembers} members contributed</span>
+                    <span>{Math.round(progress)}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-white/20">
+                    <div className="h-full rounded-full bg-gold transition-all" style={{ width: `${progress}%` }} />
+                  </div>
+                </div>
 
-            <Link
-              to="/payments"
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-primary shadow-btn transition active:scale-[0.98]"
-            >
-              Pay now <ArrowUpRight className="h-4 w-4" />
-            </Link>
+                <Link
+                  to="/payments"
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-primary shadow-btn transition active:scale-[0.98]"
+                >
+                  Pay now <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mt-4 text-2xl font-bold tracking-tight">You're all caught up 🎉</p>
+                <p className="mt-1 text-sm text-white/80">No contributions due right now.</p>
+                <Link to="/circles" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-primary shadow-btn">
+                  View your circles <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
+
 
       {/* My circles preview */}
       <section className="px-5">
