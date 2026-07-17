@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
 import { Field, SocialSection } from "./auth.signup";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth/login")({
   head: () => ({
@@ -20,10 +22,16 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try { localStorage.setItem("kolo_onboarded", "true"); } catch { /* ignore */ }
+    if (!email || !password) return;
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Welcome back");
     navigate({ to: "/" });
   };
 
@@ -50,6 +58,7 @@ function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="example@gmail.com"
             className="auth-input"
+            autoComplete="email"
           />
         </Field>
         <Field label="Password">
@@ -60,6 +69,7 @@ function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
               className="auth-input pr-12"
+              autoComplete="current-password"
             />
             <button
               type="button"
@@ -92,9 +102,10 @@ function LoginPage() {
 
         <button
           type="submit"
-          className="mt-10 w-full rounded-full bg-primary py-4 text-base font-bold text-white transition active:scale-[0.98]"
+          disabled={busy}
+          className="mt-10 w-full rounded-full bg-primary py-4 text-base font-bold text-white transition active:scale-[0.98] disabled:opacity-60"
         >
-          Sign In
+          {busy ? "Signing in…" : "Sign In"}
         </button>
       </form>
 
