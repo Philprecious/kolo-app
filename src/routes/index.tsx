@@ -21,6 +21,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { user, circles, activity, payments, unreadCount } = useApp();
+  void activity;
   const nextPayment = payments.find((p) => p.status === "upcoming");
   const nextCircle = nextPayment ? circles.find((c) => c.id === nextPayment.circleId) : undefined;
   const paidCount = nextCircle ? nextCircle.members.filter((m) => m.status === "paid").length : 0;
