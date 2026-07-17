@@ -41,7 +41,7 @@ function SignupPage() {
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Account created 🎉");
-    navigate({ to: "/onboarding" });
+    navigate({ to: "/" });
   };
 
   return (
