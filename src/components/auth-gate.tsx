@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 const PUBLIC_PREFIXES = ["/auth", "/onboarding"];
 
 export function AuthGate({ children }: { children: ReactNode }) {
-  const { loading, supaUser, user } = useApp();
+  const { loading, supaUser } = useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
@@ -14,14 +14,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (loading) return;
     if (!supaUser && !isPublic) {
       navigate({ to: "/auth/login", replace: true });
-    } else if (supaUser && !user.onboarded && pathname !== "/onboarding") {
-      navigate({ to: "/onboarding", replace: true });
-    } else if (supaUser && user.onboarded && pathname === "/onboarding") {
-      navigate({ to: "/", replace: true });
     } else if (supaUser && pathname.startsWith("/auth")) {
       navigate({ to: "/", replace: true });
     }
-  }, [loading, supaUser, user.onboarded, pathname, isPublic, navigate]);
+  }, [loading, supaUser, pathname, isPublic, navigate]);
 
   if (loading) {
     return (
@@ -31,6 +27,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
     );
   }
   if (!supaUser && !isPublic) return <div className="min-h-dvh bg-primary-pale" />;
-  if (supaUser && !user.onboarded && pathname !== "/onboarding") return <div className="min-h-dvh bg-primary-pale" />;
   return <>{children}</>;
 }
+
